@@ -47,6 +47,34 @@ const routes = [
     component: () => import('./pages/Admin/Products/CreateOption.vue'),
     props: true,
     meta: { requiresAdminAuth: true, layout: 'admin' }
+  },
+  {
+    path: '/admin/parts/:id/edit',
+    name: 'admin.parts.edit',
+    component: () => import('./pages/Admin/Products/EditPart.vue'),
+    props: true,
+    meta: { requiresAdminAuth: true, layout: 'admin' }
+  },
+  {
+    path: '/admin/options/:id/edit',
+    name: 'admin.options.edit',
+    component: () => import('./pages/Admin/Products/EditOption.vue'),
+    props: true,
+    meta: { requiresAdminAuth: true, layout: 'admin' }
+  },
+  {
+    path: '/admin/products/:id/combinations',
+    name: 'admin.products.combinations',
+    component: () => import('./pages/Admin/Products/OptionCombinations.vue'),
+    props: true,
+    meta: { requiresAdminAuth: true, layout: 'admin' }
+  },
+  {
+    path: '/admin/products/:id/price-rules',
+    name: 'admin.products.price-rules',
+    component: () => import('./pages/Admin/Products/PriceRules.vue'),
+    props: true,
+    meta: { requiresAdminAuth: true, layout: 'admin' }
   }
 ];
 

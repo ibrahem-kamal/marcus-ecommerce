@@ -11,8 +11,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('product_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('if_option_id')->constrained('part_options')->onDelete('cascade');
-            $table->foreignId('then_option_id')->constrained('part_options')->nullable(); // If null, then_part_id must be set
-            $table->foreignId('then_part_id')->constrained('parts')->nullable(); // If null, then_option_id must be set
+            $table->foreignId('then_option_id')->constrained('part_options')->nullable()->onDelete('cascade'); // If null, then_part_id must be set
+            $table->foreignId('then_part_id')->constrained('parts')->nullable()->onDelete('cascade'); // If null, then_option_id must be set
             $table->enum('rule_type', ['required', 'prohibited'])->default('required');
             $table->text('description')->nullable(); // Description of why this rule exists
             $table->boolean('active')->default(true);
