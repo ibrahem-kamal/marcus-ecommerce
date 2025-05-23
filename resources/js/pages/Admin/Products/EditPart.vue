@@ -13,103 +13,47 @@
 
       <div class="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
         <form @submit.prevent="submit" class="p-6 space-y-6">
-          <div v-if="Object.keys(errors).length > 0" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800">
-                  There were errors with your submission
-                </h3>
-                <div class="mt-2 text-sm text-red-700">
-                  <ul class="list-disc pl-5 space-y-1">
-                    <li v-for="(error, field) in errors" :key="field">{{ error }}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ErrorDisplay :errors="errors" />
+          <SuccessMessage :message="successMessage" />
 
-          <div v-if="successMessage" class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="ml-3">
-                <p class="text-sm font-medium text-green-800">
-                  {{ successMessage }}
-                </p>
-              </div>
-            </div>
-          </div>
+          <TextInput
+            label="Name"
+            id="name"
+            v-model="form.name"
+            required
+          />
+
+          <TextareaInput
+            label="Description"
+            id="description"
+            v-model="form.description"
+          />
 
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              v-model="form.name"
-              class="mt-1 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-              required
-            />
-          </div>
-
-          <div>
-            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              rows="3"
-              v-model="form.description"
-              class="mt-1 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-            ></textarea>
-          </div>
-
-          <div>
-            <label for="display_order" class="block text-sm font-medium text-gray-700">Display Order</label>
-            <input
-              type="number"
-              name="display_order"
+            <TextInput
+              label="Display Order"
               id="display_order"
               v-model="form.display_order"
-              class="mt-1 p-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              type="number"
               min="0"
             />
             <p class="mt-1 text-sm text-gray-500">Lower numbers will be displayed first</p>
           </div>
 
-          <div class="flex items-center">
-            <input
+          <div>
+            <CheckboxInput
+              label="Required"
               id="required"
-              name="required"
-              type="checkbox"
               v-model="form.required"
-              class="h-4 w-4 p-2 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label for="required" class="ml-2 block text-sm text-gray-900">
-              Required
-            </label>
             <p class="ml-4 text-sm text-gray-500">If checked, customers must select an option for this part</p>
           </div>
 
-          <div class="flex items-center">
-            <input
-              id="active"
-              name="active"
-              type="checkbox"
-              v-model="form.active"
-              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label for="active" class="ml-2 block text-sm text-gray-900">
-              Active
-            </label>
-          </div>
+          <CheckboxInput
+            label="Active"
+            id="active"
+            v-model="form.active"
+          />
 
           <div class="flex justify-end">
             <button
@@ -119,20 +63,12 @@
             >
               Delete Part
             </button>
-            <button
-              type="button"
-              class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3"
-              @click="router.push(`/admin/products/${product.id}/edit`)"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              :disabled="processing"
-            >
-              {{ processing ? 'Saving...' : 'Update Part' }}
-            </button>
+            <FormButtons
+              :processing="processing"
+              submit-text="Update Part"
+              loading-text="Saving..."
+              @cancel="router.push(`/admin/products/${product.id}/edit`)"
+            />
           </div>
         </form>
       </div>
@@ -190,59 +126,28 @@
   </div>
 
   <!-- Delete Confirmation Modal -->
-  <div v-if="showDeleteModal" class="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-      <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full" style="transform: translateY(0)">
-        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <div class="sm:flex sm:items-start">
-            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-              <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                Delete Part
-              </h3>
-              <div class="mt-2">
-                <p class="text-sm text-gray-500">
-                  Are you sure you want to delete "{{ part.name }}"? This action cannot be undone.
-                </p>
-                <p class="text-sm text-red-500 mt-2">
-                  Warning: This will also delete all options associated with this part.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button 
-            type="button" 
-            class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-150"
-            @click="deletePart"
-            :disabled="deleteProcessing"
-          >
-            {{ deleteProcessing ? 'Deleting...' : 'Delete' }}
-          </button>
-          <button 
-            type="button" 
-            class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-150"
-            @click="showDeleteModal = false"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <DeleteConfirmationModal
+    :show="showDeleteModal"
+    title="Delete Part"
+    :message="`Are you sure you want to delete &quot;${part.name}&quot;? This action cannot be undone.
+    Warning: This will also delete all options associated with this part.`"
+    :processing="deleteProcessing"
+    @confirm="deletePart"
+    @cancel="showDeleteModal = false"
+  />
 </template>
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
 import { RouterLink, useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
+import ErrorDisplay from '@/pages/Admin/components/ErrorDisplay.vue';
+import SuccessMessage from '@/pages/Admin/components/SuccessMessage.vue';
+import TextInput from '@/pages/Admin/components/TextInput.vue';
+import TextareaInput from '@/pages/Admin/components/TextareaInput.vue';
+import CheckboxInput from '@/pages/Admin/components/CheckboxInput.vue';
+import FormButtons from '@/pages/Admin/components/FormButtons.vue';
+import DeleteConfirmationModal from '@/pages/Admin/components/DeleteConfirmationModal.vue';
 
 const router = useRouter();
 const route = useRoute();
