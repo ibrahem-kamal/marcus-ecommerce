@@ -36,6 +36,43 @@
           </div>
         </div>
 
+        <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div class="bg-white overflow-hidden shadow-lg rounded-xl border border-gray-100 transition-all duration-200 hover:shadow-xl hover:border-blue-100">
+            <div class="px-6 py-6">
+              <div class="flex items-center">
+                <div class="ml-5 w-0 flex-1">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                    Manage Products
+                  </h3>
+                  <p class="text-sm text-gray-500 mb-3">
+                    View and manage your existing products
+                  </p>
+                  <RouterLink to="/admin/products" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                    View Products
+                  </RouterLink>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow-lg rounded-xl border border-gray-100 transition-all duration-200 hover:shadow-xl hover:border-green-100">
+            <div class="px-6 py-6">
+              <div class="flex items-center">
+                <div class="ml-5 w-0 flex-1">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                    Add New Product
+                  </h3>
+                  <p class="text-sm text-gray-500 mb-3">
+                    Create a new product in your catalog
+                  </p>
+                  <RouterLink to="/admin/products/create" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-150">
+                    Create Product
+                  </RouterLink>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 </template>

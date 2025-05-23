@@ -15,7 +15,39 @@ const routes = [
     component: () => import('./pages/Admin/Dashboard.vue'),
     meta: { requiresAdminAuth: true, layout: 'admin' }
   },
- 
+  {
+    path: '/admin/products',
+    name: 'admin.products.index',
+    component: () => import('./pages/Admin/Products/Index.vue'),
+    meta: { requiresAdminAuth: true, layout: 'admin' }
+  },
+  {
+    path: '/admin/products/create',
+    name: 'admin.products.create',
+    component: () => import('./pages/Admin/Products/Create.vue'),
+    meta: { requiresAdminAuth: true, layout: 'admin' }
+  },
+  {
+    path: '/admin/products/:id/edit',
+    name: 'admin.products.edit',
+    component: () => import('./pages/Admin/Products/Edit.vue'),
+    props: true,
+    meta: { requiresAdminAuth: true, layout: 'admin' }
+  },
+  {
+    path: '/admin/products/:id/parts/create',
+    name: 'admin.parts.create',
+    component: () => import('./pages/Admin/Products/CreatePart.vue'),
+    props: true,
+    meta: { requiresAdminAuth: true, layout: 'admin' }
+  },
+  {
+    path: '/admin/parts/:id/options/create',
+    name: 'admin.options.create',
+    component: () => import('./pages/Admin/Products/CreateOption.vue'),
+    props: true,
+    meta: { requiresAdminAuth: true, layout: 'admin' }
+  }
 ];
 
 const router = createRouter({
