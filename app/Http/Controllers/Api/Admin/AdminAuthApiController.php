@@ -2,54 +2,41 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Actions\Admin\Auth\GetAdminUserAction;
+use App\Actions\Admin\Auth\LoginAdminAction;
+use App\Actions\Admin\Auth\LogoutAdminAction;
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
+use App\Http\Requests\Admin\Auth\LoginAdminRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AdminAuthApiController extends Controller
 {
     /**
      * Handle an authentication attempt.
      */
-    public function login(Request $request)
+    public function login(LoginAdminRequest $request, LoginAdminAction $action)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $result = $action->handle($request->validated());
 
-        if (Auth::guard('admin')->attempt($credentials)) {
-            $admin = Admin::where('email', $request->email)->first();
-            $token = $admin->createToken('admin-token')->plainTextToken;
-            
-            return response()->json([
-                'token' => $token,
-                'admin' => $admin,
-            ]);
-        }
-
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
-        ]);
+        return response()->json($result);
     }
 
     /**
      * Get the authenticated admin user.
      */
-    public function user(Request $request)
+    public function user(Request $request, GetAdminUserAction $action)
     {
-        return response()->json($request->user());
+        $user = $action->handle($request->user());
+
+        return response()->json($user);
     }
 
     /**
      * Log the user out of the application.
      */
-    public function logout(Request $request)
+    public function logout(Request $request, LogoutAdminAction $action)
     {
-        $request->user()->currentAccessToken()->delete();
+        $action->handle($request->user());
 
         return response()->json(['message' => 'Logged out successfully']);
     }

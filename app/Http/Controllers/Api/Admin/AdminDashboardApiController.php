@@ -2,23 +2,18 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Actions\Admin\Dashboard\GetDashboardStatsAction;
 use App\Http\Controllers\Controller;
-use App\Models\ProductType;
-use Illuminate\Http\Request;
 
 class AdminDashboardApiController extends Controller
 {
     /**
      * Display the admin dashboard stats.
      */
-    public function index()
+    public function index(GetDashboardStatsAction $action)
     {
-        $productCount = ProductType::count();
-        
-        return response()->json([
-            'stats' => [
-                'productCount' => $productCount,
-            ]
-        ]);
+        $stats = $action->handle();
+
+        return response()->json($stats);
     }
 }

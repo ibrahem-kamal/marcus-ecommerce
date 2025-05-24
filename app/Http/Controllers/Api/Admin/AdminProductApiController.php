@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Actions\Admin\Product\CreateProductAction;
+use App\Actions\Admin\Product\DeleteProductAction;
+use App\Actions\Admin\Product\GetProductAction;
+use App\Actions\Admin\Product\ListProductsAction;
+use App\Actions\Admin\Product\UpdateProductAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Product\CreateProductRequest;
+use App\Http\Requests\Admin\Product\UpdateProductRequest;
 use App\Models\Part;
 use App\Models\PartOption;
 use App\Models\ProductType;
@@ -13,97 +20,61 @@ class AdminProductApiController extends Controller
     /**
      * Display a listing of the products.
      */
-    public function index()
+    public function index(ListProductsAction $action)
     {
-        $products = ProductType::withCount('parts')->get();
+        $result = $action->handle();
 
-        return response()->json([
-            'products' => $products
-        ]);
+        return response()->json($result);
     }
 
     /**
      * Store a newly created product in storage.
      */
-    public function store(Request $request)
+    public function store(CreateProductRequest $request, CreateProductAction $action)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'active' => 'boolean',
-        ]);
+        $result = $action->handle($request->validated());
 
-        $product = ProductType::create($validated);
-
-        return response()->json([
-            'message' => 'Product created successfully.',
-            'product' => $product
-        ], 201);
+        return response()->json($result, 201);
     }
 
     /**
      * Display the specified product.
      */
-    public function show(ProductType $product)
+    public function show(ProductType $product, GetProductAction $action)
     {
-        $product->load('parts.options');
+        $result = $action->handle($product);
 
-        return response()->json([
-            'product' => $product
-        ]);
+        return response()->json($result);
     }
 
     /**
      * Update the specified product in storage.
      */
-    public function update(Request $request, ProductType $product)
+    public function update(UpdateProductRequest $request, ProductType $product, UpdateProductAction $action)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'active' => 'boolean',
-        ]);
+        $result = $action->handle($product, $request->validated());
 
-        $product->update($validated);
-
-        return response()->json([
-            'message' => 'Product updated successfully.',
-            'product' => $product
-        ]);
+        return response()->json($result);
     }
 
     /**
      * Remove the specified product from storage.
      */
-    public function destroy(ProductType $product)
+    public function destroy(ProductType $product, DeleteProductAction $action)
     {
-        $product->delete();
+        $result = $action->handle($product);
 
-        return response()->json([
-            'message' => 'Product deleted successfully.'
-        ]);
+        return response()->json($result);
     }
 
     /**
      * Store a newly created part in storage.
      */
-    public function storePart(Request $request, ProductType $product)
+    public function storePart(CreatePartRequest $request, ProductType $product, CreatePartAction $action)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'display_order' => 'integer',
-            'required' => 'boolean',
-            'active' => 'boolean',
-        ]);
+        $result = $action->handle($product, $request->validated());
 
-        $validated['product_type_id'] = $product->id;
-        $part = Part::create($validated);
-
-        return response()->json([
-            'message' => 'Part added successfully.',
-            'part' => $part
-        ], 201);
+        return response()->json($result, 201);
     }
 
     /**
