@@ -4,6 +4,7 @@ namespace App\Actions\Admin\Auth;
 
 use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class LoginAdminAction
@@ -17,13 +18,13 @@ class LoginAdminAction
      */
     public function handle(array $credentials): array
     {
-        if (!Auth::guard('admin')->attempt($credentials)) {
+        $admin = Admin::where('email', $credentials['email'])->first();
+        if (! $admin || ! Hash::check($credentials['password'], $admin->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        $admin = Admin::where('email', $credentials['email'])->first();
         $token = $admin->createToken('admin-token')->plainTextToken;
         
         return [

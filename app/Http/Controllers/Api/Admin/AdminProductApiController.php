@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Actions\Admin\Part\CreatePartAction;
 use App\Actions\Admin\Product\CreateProductAction;
 use App\Actions\Admin\Product\DeleteProductAction;
 use App\Actions\Admin\Product\GetProductAction;
 use App\Actions\Admin\Product\ListProductsAction;
 use App\Actions\Admin\Product\UpdateProductAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Part\CreatePartRequest;
 use App\Http\Requests\Admin\Product\CreateProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
 use App\Models\Part;

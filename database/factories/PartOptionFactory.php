@@ -13,6 +13,8 @@ class PartOptionFactory extends Factory
     public function definition()
     {
         return [
+            'name'=> $this->faker->word(),
+            'base_price' => $this->faker->randomFloat(2, 0, 100),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];

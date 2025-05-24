@@ -13,6 +13,7 @@ class PartFactory extends Factory
     public function definition()
     {
         return [
+            'name' => $this->faker->word(),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
