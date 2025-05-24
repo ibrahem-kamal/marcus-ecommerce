@@ -34,6 +34,12 @@
               v-model="form.active"
             />
 
+            <FileInput
+              label="Product Image"
+              id="image"
+              v-model="form.image"
+            />
+
             <FormButtons
               :processing="processing"
               submit-text="Save Product"
@@ -55,13 +61,15 @@ import ErrorDisplay from '@/pages/Admin/components/ErrorDisplay.vue';
 import TextInput from '@/pages/Admin/components/TextInput.vue';
 import TextareaInput from '@/pages/Admin/components/TextareaInput.vue';
 import CheckboxInput from '@/pages/Admin/components/CheckboxInput.vue';
+import FileInput from '@/pages/Admin/components/FileInput.vue';
 import FormButtons from '@/pages/Admin/components/FormButtons.vue';
 
 const router = useRouter();
 const form = reactive({
   name: '',
   description: '',
-  active: true
+  active: true,
+  image: null
 });
 
 const processing = ref(false);
@@ -72,7 +80,22 @@ async function submit() {
   Object.keys(errors).forEach(key => delete errors[key]);
 
   try {
-    await axios.post('/admin/products', form);
+    // Use FormData to handle file uploads
+    const formData = new FormData();
+    formData.append('name', form.name);
+    formData.append('description', form.description || '');
+    formData.append('active', form.active ? '1' : '0');
+
+    if (form.image) {
+      formData.append('image', form.image);
+    }
+
+    await axios.post('/admin/products', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
     processing.value = false;
     router.push('/admin/products');
   } catch (error) {

@@ -13,6 +13,7 @@ class ProductType extends Model
         'name',
         'description',
         'active',
+        'image_path',
     ];
     protected $casts = [
         'active' => 'boolean',

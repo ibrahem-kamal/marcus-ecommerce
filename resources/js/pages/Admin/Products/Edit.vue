@@ -35,6 +35,12 @@
                         v-model="form.active"
                     />
 
+                    <FileInput
+                        label="Product Image"
+                        id="image"
+                        v-model="form.image"
+                    />
+
                     <FormButtons
                         :processing="processing"
                         submit-text="Update Product"
@@ -152,6 +158,7 @@ import SuccessMessage from '@/pages/Admin/components/SuccessMessage.vue';
 import TextInput from '@/pages/Admin/components/TextInput.vue';
 import TextareaInput from '@/pages/Admin/components/TextareaInput.vue';
 import CheckboxInput from '@/pages/Admin/components/CheckboxInput.vue';
+import FileInput from '@/pages/Admin/components/FileInput.vue';
 import FormButtons from '@/pages/Admin/components/FormButtons.vue';
 
 const router = useRouter();
@@ -161,7 +168,8 @@ const product = ref({});
 const form = reactive({
     name: '',
     description: '',
-    active: false
+    active: false,
+    image: null
 });
 
 const processing = ref(false);
@@ -179,6 +187,11 @@ onMounted(async () => {
         form.description = product.value.description || '';
         form.active = product.value.active;
 
+        // Set image path if available
+        if (product.value.image_path) {
+            form.image = product.value.image_path;
+        }
+
         // Check for flash message from URL query params if available
         if (route.query.success) {
             successMessage.value = route.query.success;
@@ -194,7 +207,23 @@ async function submit() {
     Object.keys(errors).forEach(key => delete errors[key]);
 
     try {
-        await axios.put(`/admin/products/${product.value.id}`, form);
+        // Use FormData to handle file uploads
+        const formData = new FormData();
+        formData.append('name', form.name);
+        formData.append('description', form.description || '');
+        formData.append('active', form.active ? '1' : '0');
+
+        // Only append image if it's a File object (new upload)
+        if (form.image && form.image instanceof File) {
+            formData.append('image', form.image);
+        }
+        formData.append('_method', 'PUT');
+        await axios.post(`/admin/products/${product.value.id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
         processing.value = false;
         successMessage.value = 'Product updated successfully.';
     } catch (error) {

@@ -25,6 +25,7 @@ class UpdateProductRequest extends FormRequest
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'active' => 'boolean',
+            'image' => 'nullable|image|max:2048', // Max 2MB
         ];
     }
 }

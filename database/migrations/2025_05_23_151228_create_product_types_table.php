@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name'); // e.g., 'Bicycle', 'Ski', 'Surfboard'
             $table->text('description')->nullable();
+            $table->string('image_path')->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
         });

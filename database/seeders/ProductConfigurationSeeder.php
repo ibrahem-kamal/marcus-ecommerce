@@ -8,6 +8,8 @@ use App\Models\PartOption;
 use App\Models\PriceRule;
 use App\Models\ProductType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class ProductConfigurationSeeder extends Seeder
 {
@@ -16,6 +18,22 @@ class ProductConfigurationSeeder extends Seeder
      */
     public function run(): void
     {
+        // Copy the bicycle-dummy.png from public/assets to storage/app/public/products
+        $sourcePath = public_path('assets/bicycle-dummy.png');
+        $filename = 'bicycle-dummy.png';
+        $destinationPath = 'products/' . $filename;
+
+        // Check if the source file exists
+        if (File::exists($sourcePath)) {
+            // Copy the file to the storage directory
+            Storage::disk('public')->put($destinationPath, File::get($sourcePath));
+            // Get the URL for the stored file
+            $imageUrl = Storage::url($destinationPath);
+        } else {
+            // Fallback to the original path if the file doesn't exist
+            $imageUrl = '/assets/bicycle-dummy.png';
+        }
+
         // Check if Bicycle product type already exists
         $bicycle = ProductType::query()->where('name', 'Bicycle')->first();
 
@@ -25,8 +43,16 @@ class ProductConfigurationSeeder extends Seeder
                 'name' => 'Bicycle',
                 'description' => 'Customize your own bicycle with various options.',
                 'active' => true,
+                'image_path' => $imageUrl,
             ]);
-        } 
+        } else {
+            // Update the image_path if it's not set
+            if (!$bicycle->image_path) {
+                $bicycle->update([
+                    'image_path' => $imageUrl,
+                ]);
+            }
+        }
 
         // Create or retrieve parts for Bicycle
         $framePart = Part::query()->where('product_type_id', $bicycle->id)
