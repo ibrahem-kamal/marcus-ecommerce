@@ -1,0 +1,31 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: marcus-ecommerce
+    container_name: marcus-ecommerce-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - marcus-network
+
+  webserver:
+    image: nginx:alpine
+    container_name: marcus-ecommerce-webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - marcus-network
+    depends_on:
+      - app
+
+networks:
+  marcus-network:
+    driver: bridge

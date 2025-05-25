@@ -169,18 +169,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter, RouterLink } from 'vue-router';
+import { ref, onMounted, computed, watch } from 'vue';
+import { useRouter, RouterLink, useRoute } from 'vue-router';
 import axios from 'axios';
 
 const router = useRouter();
+const route = useRoute();
 const mobileMenuOpen = ref(false);
 const admin = ref({ name: '', email: '' });
+const authState = ref(!!localStorage.getItem('admin_token'));
 
 // Check if user is authenticated
 const isAuthenticated = computed(() => {
-  return !!localStorage.getItem('admin_token');
+  return authState.value;
 });
+
+// Watch for route changes to update authentication state
+watch(route, () => {
+  authState.value = !!localStorage.getItem('admin_token');
+}, { immediate: true });
 
 onMounted(async () => {
   if (isAuthenticated.value) {
@@ -192,6 +199,7 @@ onMounted(async () => {
       // If token is invalid, remove it and redirect to login
       if (error.response && error.response.status === 401) {
         localStorage.removeItem('admin_token');
+        authState.value = false;
         router.push('/admin/login');
       }
     }
@@ -202,6 +210,7 @@ async function logout() {
   try {
     await axios.post('/admin/logout');
     localStorage.removeItem('admin_token');
+    authState.value = false;
     router.push('/admin/login');
   } catch (error) {
     console.error('Failed to logout:', error);
