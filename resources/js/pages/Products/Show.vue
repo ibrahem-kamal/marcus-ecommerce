@@ -463,7 +463,7 @@ function formatPrice(price) {
 }
 
 // Add to cart handler
-function addToCartHandler() {
+async function addToCartHandler() {
   if (!isConfigurationValid.value) return;
 
   const selectedOptionsData = {};
@@ -481,22 +481,27 @@ function addToCartHandler() {
     };
   }
 
-  // Add product to cart
-  addToCart(
-    {
-      id: product.value.id,
-      name: product.value.name,
-      image_path: product.value.image_path
-    }, 
-    {
-      options: selectedOptionsData,
-      priceAdjustments: priceAdjustments.value,
-      totalPrice: totalPrice.value
-    }
-  );
+  try {
+    // Add product to cart
+    await addToCart(
+      {
+        id: product.value.id,
+        name: product.value.name,
+        image_path: product.value.image_path
+      }, 
+      {
+        options: selectedOptionsData,
+        price_adjustments: priceAdjustments.value,
+        totalPrice: totalPrice.value
+      }
+    );
 
-  // Show confirmation and redirect to products page
-  alert('Product added to cart!');
-  router.push('/');
+    // Show confirmation and redirect to products page
+    alert('Product added to cart!');
+    router.push('/');
+  } catch (error) {
+    console.error('Failed to add product to cart:', error);
+    alert('Failed to add product to cart. Please try again.');
+  }
 }
 </script>

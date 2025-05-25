@@ -94,40 +94,136 @@
 <script setup>
 import { ref, onMounted, computed, provide } from 'vue';
 import { useRouter, RouterLink } from 'vue-router';
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = useRouter();
 const mobileMenuOpen = ref(false);
 const cartItems = ref([]);
+const cartId = ref('');
+const isAddingToCart = ref(false);
+
+// Generate or retrieve cart ID
+function getCartId() {
+  // Check if we already have a cart ID in localStorage
+  const savedCartId = localStorage.getItem('cart_id');
+  if (savedCartId) {
+    cartId.value = savedCartId;
+    return savedCartId;
+  }
+
+  // Generate a new cart ID
+  const newCartId = uuidv4();
+  cartId.value = newCartId;
+  localStorage.setItem('cart_id', newCartId);
+  return newCartId;
+}
 
 provide('cartItems', cartItems);
+provide('cartId', cartId);
 
 // Add to cart function
-function addToCart(product, selectedOptions) {
-  const cartItem = {
-    id: Date.now(), // Unique ID for the cart item
-    product,
-    selectedOptions,
-    timestamp: new Date()
-  };
+async function addToCart(product, selectedOptions) {
+  if (isAddingToCart.value) return;
 
-  cartItems.value.push(cartItem);
+  try {
+    isAddingToCart.value = true;
 
-  // Could save to localStorage here if needed
-  localStorage.setItem('cart', JSON.stringify(cartItems.value));
+    // Get or generate cart ID
+    const currentCartId = getCartId();
+
+    // Prepare data for API
+    const cartData = {
+      cart_id: currentCartId,
+      product_id: product.id,
+      selected_options: selectedOptions,
+      total_price: selectedOptions.totalPrice
+    };
+
+    // Send to backend
+    const response = await axios.post('/cart', cartData);
+
+    // Add to local cart items
+    const cartItem = {
+      id: Date.now(), // Unique ID for the cart item
+      product,
+      selectedOptions,
+      timestamp: new Date()
+    };
+
+    cartItems.value.push(cartItem);
+
+    // Save to localStorage
+    localStorage.setItem('cart', JSON.stringify(cartItems.value));
+
+    return response.data;
+  } catch (error) {
+    console.error('Failed to add item to cart:', error);
+    throw error;
+  } finally {
+    isAddingToCart.value = false;
+  }
 }
 
 // Provide addToCart function to child components
 provide('addToCart', addToCart);
 
-// Load cart from localStorage on mount
-onMounted(() => {
-  const savedCart = localStorage.getItem('cart');
-  if (savedCart) {
-    try {
-      cartItems.value = JSON.parse(savedCart);
-    } catch (e) {
-      console.error('Failed to parse cart from localStorage:', e);
+// Validate cart with backend and load from localStorage
+async function validateCart() {
+  const currentCartId = getCartId();
+
+  try {
+    // Call the API to validate the cart
+    const response = await axios.get('/cart/validate', {
+      params: { cart_id: currentCartId }
+    });
+
+    if (response.data.exists) {
+      // Cart exists in the database, update local storage with the latest data
+      const backendCartItems = response.data.cart_items;
+
+      // Transform backend cart items to match the local format
+      const transformedCartItems = backendCartItems.map(item => ({
+        id: item.id,
+        product: {
+          id: item.product.id,
+          name: item.product.name,
+          image_path: item.product.image_path
+        },
+        selectedOptions: item.selected_options,
+      }));
+
+      // Update cart items
+      cartItems.value = transformedCartItems;
+
+      // Save updated cart to localStorage
+      localStorage.setItem('cart', JSON.stringify(cartItems.value));
+    } else {
+      // Cart doesn't exist in the database, clear local storage
+      cartItems.value = [];
+      localStorage.removeItem('cart');
+    }
+  } catch (error) {
+    console.error('Failed to validate cart with backend:', error);
+
+    // If API call fails, still try to load from localStorage as fallback
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        cartItems.value = JSON.parse(savedCart);
+      } catch (e) {
+        console.error('Failed to parse cart from localStorage:', e);
+      }
     }
   }
+}
+
+// Load cart from localStorage on mount
+onMounted(() => {
+  // Get or generate cart ID
+  getCartId();
+
+  // Validate cart with backend
+  validateCart();
 });
 </script>

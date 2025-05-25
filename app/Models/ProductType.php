@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,5 +41,10 @@ class ProductType extends Model
     public function priceRules(): HasMany
     {
         return $this->hasMany(PriceRule::class);
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('active', true);
     }
 }
