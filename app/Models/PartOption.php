@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -64,5 +65,14 @@ class PartOption extends Model
     public function dependentPriceRules(): HasMany
     {
         return $this->hasMany(PriceRule::class, 'dependent_option_id');
+    }
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('active', true);
+    }
+
+    public function scopeInStock(Builder $query): Builder
+    {
+        return $query->where('in_stock', true);
     }
 }
